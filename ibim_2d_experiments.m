@@ -7,21 +7,25 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+%%
 opt.type = 'circle'; % type of the domain
 opt.R  = 0.75;       % radius of the circle
 opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3); % test integrand 
 
 % call Mathematica to produce accurate value.
-F = sprintf(['''NIntegrate[%f * Cos[%f^2 * Cos[t]^2 - %f * Sin[t]]', ...
-    '* Sin[%f^2 * Sin[t]^2 - %f^3 * Cos[t]^3],', ...
-    '{t, 0, 2*Pi}, WorkingPrecision->15]'''],...
-    opt.R, opt.R, opt.R, opt.R, opt.R);  % Mathematica Eval
+if ~check_installation()
+    F = sprintf(['''NIntegrate[%f * Cos[%f^2 * Cos[t]^2 - %f * Sin[t]]', ...
+        '* Sin[%f^2 * Sin[t]^2 - %f^3 * Cos[t]^3],', ...
+        '{t, 0, 2*Pi}, WorkingPrecision->15]'''],...
+        opt.R, opt.R, opt.R, opt.R, opt.R);  % Mathematica Eval
+    
+    [status, cmdout] = system(sprintf(['wolframscript -code ', F]));
+    acc = str2double( cmdout(1:16) );
+else 
+    acc = 0.992902336403640;
+end
 
-[status, cmdout] = system(sprintf(['wolframscript -code ', F]));
-acc = str2double( cmdout(1:16) );
-
-fprintf('accurate integral is %f by Mathematica.\n', acc);
+fprintf('accurate integral is %1.15f by Mathematica.\n', acc);
 
 %% regularity
 opt.q = 1; % order of the regularity 
