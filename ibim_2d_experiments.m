@@ -56,9 +56,13 @@ if S == 1 % no random translation is applied
     end
 
     % plot the convergence rate
-    g = 1./(base_grid * floor(grow_rate.^(1:K)));
+    g = 2./(floor(base_grid * grow_rate.^(1:K)));
 
-    loglog(g, abs(ret - acc), '-bo',  g, 2*g.^beta, '-r');
+    err = abs(ret - acc);
+    gamma = ( g.^(beta) * err) / norm(g.^(beta))^2;
+
+    loglog(g, err, '-bo',  g, gamma * g.^(beta), '-r');
+
     legend_handler = legend('quadrature error', sprintf('O(h^{%1.1f})', beta), 'Location', 'northwest');
     fontsize(legend_handler,18,'points');
 
@@ -84,9 +88,12 @@ else % random translations are used
     end
 
     %% plot the convergence rate
-    g = 1./( floor(base_grid * grow_rate.^(1:K)));
+    g = 2./( floor(base_grid * grow_rate.^(1:K)));
 
-    loglog(g, sum( (ret - acc).^2, 2)/S, '-bo',  g, 1e-4*g.^(2*beta), '-r');
+    var_err = sum( (ret - acc).^2, 2)/S;
+    gamma = ( g.^(2*beta) * var_err) / norm(g.^(2*beta))^2;
+
+    loglog(g, var_err, '-bo',  g, gamma * g.^(2*beta), '-r');
     legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', 2*beta), 'Location', 'northwest');
     fontsize(legend_handler,18,'points');
 
