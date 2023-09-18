@@ -37,7 +37,7 @@ kappa = 0.5 + (opt.q + 1) * (1 - alpha); % for curves
 delta = 3 - alpha;% for lines, random
 
 K = 24; % number of grid sizes
-S = 1; % number of sampled rigid transforms
+S = 32; % number of sampled rigid transforms
 
 ret = zeros(K, S);
 
@@ -119,12 +119,13 @@ if S == 1
     
     grid on;
 else
-    parfor s = 1:S
+    for s = 1:S
         % random rotation
+   
         theta = rand() * 2 * pi;
         v = [cos(theta), sin(theta)];
 
-        for k = 1:K
+        parfor k = 1:K
             N = floor(grow_rate^k * base_grid);
             if alpha == 0
                 EPS = 0.1;
@@ -194,8 +195,8 @@ else
     eta = ( g.^(2*kappa) * var_err) / norm(g.^(2*kappa))^2; %curve
 
     loglog(g, var_err, '-bo',  g, gamma * g.^(delta), '-r', g, eta * g.^(2*kappa), '--k');
-    legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', 2*beta),...
-        sprintf('O(h^{%1.1f})', 2*delta), 'Location', 'southeast');
+    legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', delta),...
+        sprintf('O(h^{%1.1f})', 2*kappa), 'Location', 'southeast');
     fontsize(legend_handler,18,'points');
 
     grid on;
