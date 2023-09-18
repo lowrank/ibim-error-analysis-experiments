@@ -12,12 +12,11 @@ opt.q = 1;
 % integrand function
 opt.f = @(x, y) ( cos(x.^2 - y)) .* sin(y.^2 - x.^3);
 
-% quadratically irrational slope, used only if opt.random = false
-%
 % In the implementation, instead of rotating the geometry, we rotate the
 % lattice points for keep the integrand function unmodified.
-%
 
+% inclination of capsule.
+opt.slope = sqrt(2);  
 
 % radius of the semi-circles in capsule.
 %
@@ -26,18 +25,18 @@ opt.f = @(x, y) ( cos(x.^2 - y)) .* sin(y.^2 - x.^3);
 %
 opt.R = 0.2;
 
-% inclination of capsule.
-opt.slope = sqrt(2);  
-
-% accurate integral over [-0.5, 0.5]
-acc = 0.25;
+% compute accurate integral.
+acc_semi_circles = 0.02272974686046358;
+acc_rectangle    = 0.0778101035506957;
+acc = acc_semi_circles + acc_rectangle;
 
 %% tube width
-alpha= 0.5;
-beta = 2-alpha;
+alpha= 1;
+beta = 2-alpha; % for lines
+delta = 0.5 + (opt.q + 1) * (1 - alpha); % for curves
 
 K = 24; % number of grid sizes
-S = 32; % number of sampled rigid transforms
+S = 1; % number of sampled rigid transforms
 
 ret = zeros(K, S);
 
@@ -61,20 +60,45 @@ if S == 1
         [X, Y] = meshgrid(pts);
         
         M = (N + 1)^2;
-
-        Data = zeros(M , 1);
     
         for i = 1:M
             rx = X(i) * v(1) + Y(i) * v(2);
             ry = X(i) * v(2) - Y(i) * v(1);
             
-            if rx >= -0.5 && rx <= 0.5
-                if abs(ry) <= EPS
-                    ret(k) = ret(k) +  opt.f(rx) * weight_func(ry, EPS, opt);
+            if rx > 0.5
+                % in right semi-cicle centered at (0.5, 0),
+                dist   =  sqrt((rx -0.5)^2 + ry^2) - opt.R;
+                normal = [rx - 0.5, ry] / sqrt((rx-0.5)^2 + ry^2);
+                Jac    = opt.R / (dist + opt.R);
+                px = rx - dist * normal(1);
+                py = ry - dist * normal(2);
+                if abs(dist) <= EPS
+                    ret(k) = ret(k) + opt.f(px, py) *...
+                        weight_func(dist, EPS, opt) * Jac;
+                end
+
+            elseif rx < -0.5
+                % in left semi-circle centered at (-0.5, 0)
+                dist   =  sqrt((rx + 0.5)^2 + ry^2) - opt.R;
+                normal = [rx + 0.5, ry] / sqrt((rx + 0.5)^2 + ry^2);
+                Jac    = opt.R / (dist + opt.R);
+                px = rx - dist * normal(1);
+                py = ry - dist * normal(2);
+                if abs(dist) <= EPS
+                    ret(k) = ret(k) + opt.f(px, py) *...
+                        weight_func(dist, EPS, opt) * Jac;
+                end
+            else
+                % in rectangle
+                if abs(ry - opt.R) <= EPS
+                    ret(k) = ret(k) +  opt.f(rx, opt.R) *...
+                        weight_func(ry - opt.R, EPS, opt);
+                elseif abs(ry + opt.R) <= EPS
+                    ret(k) = ret(k) +  opt.f(rx, -opt.R) *...
+                        weight_func(ry + opt.R, EPS, opt);
                 end
             end
         end
-
         ret(k) = ret(k) * h^2;
     end
     %% plot the convergence rate
@@ -82,10 +106,14 @@ if S == 1
     
     err = abs(ret - acc);
     gamma = ( g.^(beta) * err) / norm(g.^(beta))^2;
+    eta = ( g.^(delta) * err) / norm(g.^(delta))^2;
+    loglog(g, err, '-bo',  g, gamma * g.^(beta), '-r',...
+        g, eta * g.^(delta), '--k');
     
-    loglog(g, err, '-bo',  g, gamma * g.^(beta), '-r');
-    
-    legend_handler = legend('quadrature error', sprintf('O(h^{%1.1f})', beta), 'Location', 'northwest');
+    legend_handler = legend('quadrature error',...
+        sprintf('O(h^{%1.1f})', beta),...
+        sprintf('O(h^{%1.1f})', delta),...
+        'Location', 'southeast');
     fontsize(legend_handler,18,'points');
     
     grid on;
@@ -109,26 +137,50 @@ else
             h = 2 / N;   
             [X, Y] = meshgrid(pts);
 
-            % make a random shift of grid.
             X = X + shift(1);
             Y = Y + shift(2);
             
             M = (N + 1)^2;
-    
-            Data = zeros(M , 1);
         
             for i = 1:M
                 rx = X(i) * v(1) + Y(i) * v(2);
                 ry = X(i) * v(2) - Y(i) * v(1);
                 
-                if rx >= -0.5 && rx <= 0.5
-                    if abs(ry) <= EPS
-                        ret(k, s) = ret(k, s) +  opt.f(rx) * weight_func(ry, EPS, opt);
+                if rx > 0.5
+                    % in right semi-cicle centered at (0.5, 0),
+                    dist   =  sqrt((rx -0.5)^2 + ry^2) - opt.R;
+                    normal = [rx - 0.5, ry] / sqrt((rx-0.5)^2 + ry^2);
+                    Jac    = opt.R / (dist + opt.R);
+                    px = rx - dist * normal(1);
+                    py = ry - dist * normal(2);
+                    if abs(dist) <= EPS
+                        ret(k,s) = ret(k,s) + opt.f(px, py) *...
+                            weight_func(dist, EPS, opt) * Jac;
+                    end
+    
+                elseif rx < -0.5
+                    % in left semi-circle centered at (-0.5, 0)
+                    dist   =  sqrt((rx + 0.5)^2 + ry^2) - opt.R;
+                    normal = [rx + 0.5, ry] / sqrt((rx + 0.5)^2 + ry^2);
+                    Jac    = opt.R / (dist + opt.R);
+                    px = rx - dist * normal(1);
+                    py = ry - dist * normal(2);
+                    if abs(dist) <= EPS
+                        ret(k,s) = ret(k,s) + opt.f(px, py) *...
+                            weight_func(dist, EPS, opt) * Jac;
+                    end
+                else
+                    % in rectangle
+                    if abs(ry - opt.R) <= EPS
+                        ret(k,s) = ret(k,s) +  opt.f(rx, opt.R) *...
+                            weight_func(ry - opt.R, EPS, opt);
+                    elseif abs(ry + opt.R) <= EPS
+                        ret(k,s) = ret(k,s) +  opt.f(rx, -opt.R) *...
+                            weight_func(ry + opt.R, EPS, opt);
                     end
                 end
             end
-    
-            ret(k, s) = ret(k, s) * h^2;
+            ret(k,s) = ret(k,s) * h^2;
         end
     end
 
@@ -138,8 +190,11 @@ else
     var_err = sum( (ret - acc).^2, 2)/S;
     gamma = ( g.^(2*beta) * var_err) / norm(g.^(2*beta))^2;
 
-    loglog(g, var_err, '-bo',  g, gamma * g.^(2*beta), '-r');
-    legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', 2*beta), 'Location', 'northwest');
+    eta = ( g.^(2*delta) * var_err) / norm(g.^(2*delta))^2;
+
+    loglog(g, var_err, '-bo',  g, gamma * g.^(2*beta), '-r', g, eta * g.^(2*delta), '--k');
+    legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', 2*beta),...
+        sprintf('O(h^{%1.1f})', 2*delta), 'Location', 'southeast');
     fontsize(legend_handler,18,'points');
 
     grid on;
