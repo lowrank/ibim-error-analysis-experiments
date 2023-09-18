@@ -7,23 +7,25 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 opt.type = 'line';
-opt.q = 1;
+opt.q = 2;
 
 % integrand is defined along the "line".
 opt.f = @(x) (3*x^2);
 
 % quadratically irrational slope, used only if opt.random = false
 opt.slope = sqrt(2);  
+% opt.slope = (sqrt(5)+1)/2;
 
 % accurate integral over [-0.5, 0.5]
 acc = 0.25;
 
 %% tube width
-alpha= 0.5;
-beta = 2-alpha;
+alpha= 0;
+beta = 2 - alpha; % irrational slope
+delta = 3 - alpha; % variance of random slope
 
 K = 24; % number of grid sizes
-S = 32; % number of sampled rigid transforms
+S = 64; % number of sampled rigid transforms
 
 ret = zeros(K, S);
 
@@ -122,10 +124,10 @@ else
     g = 2./( floor(base_grid * grow_rate.^(1:K)));
 
     var_err = sum( (ret - acc).^2, 2)/S;
-    gamma = ( g.^(2*beta) * var_err) / norm(g.^(2*beta))^2;
+    gamma = ( g.^(delta) * var_err) / norm(g.^(delta))^2;
 
-    loglog(g, var_err, '-bo',  g, gamma * g.^(2*beta), '-r');
-    legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', 2*beta), 'Location', 'northwest');
+    loglog(g, var_err, '-bo',  g, gamma * g.^(delta), '-r');
+    legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', delta), 'Location', 'northwest');
     fontsize(legend_handler,18,'points');
 
     grid on;

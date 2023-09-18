@@ -34,6 +34,7 @@ acc = acc_semi_circles + acc_rectangle;
 alpha= 1;
 beta = 2-alpha; % for lines
 delta = 0.5 + (opt.q + 1) * (1 - alpha); % for curves
+kappa = 3 - alpha;% for lines, random
 
 K = 24; % number of grid sizes
 S = 1; % number of sampled rigid transforms
@@ -188,11 +189,11 @@ else
     g = 2./( floor(base_grid * grow_rate.^(1:K)));
 
     var_err = sum( (ret - acc).^2, 2)/S;
-    gamma = ( g.^(2*beta) * var_err) / norm(g.^(2*beta))^2;
+    gamma = ( g.^(kappa) * var_err) / norm(g.^(kappa))^2;
 
     eta = ( g.^(2*delta) * var_err) / norm(g.^(2*delta))^2;
 
-    loglog(g, var_err, '-bo',  g, gamma * g.^(2*beta), '-r', g, eta * g.^(2*delta), '--k');
+    loglog(g, var_err, '-bo',  g, gamma * g.^(kappa), '-r', g, eta * g.^(2*delta), '--k');
     legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', 2*beta),...
         sprintf('O(h^{%1.1f})', 2*delta), 'Location', 'southeast');
     fontsize(legend_handler,18,'points');
