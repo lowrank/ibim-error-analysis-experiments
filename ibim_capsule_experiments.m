@@ -37,9 +37,9 @@ kappa = 0.5 + (opt.q + 1) * (1 - alpha); % for curves
 delta = 3 - alpha;% for lines, random
 
 K = 24; % number of grid sizes
-S = 32; % number of sampled rigid transforms
+S = 64; % number of sampled rigid transforms
 
-ret = zeros(K, S);
+ret = zeros(K * S, 1);
 
 base_grid = 100;
 grow_rate = 1.2;
@@ -47,7 +47,7 @@ grow_rate = 1.2;
 if S == 1
     opt.random = false;
     v  = [opt.slope,  1]/sqrt(1 + opt.slope^2);
-
+    progress = PoolWaitbar(K, 'Starting');
     parfor k = 1:K
         N = floor(grow_rate^k * base_grid);
         if alpha == 0
@@ -101,6 +101,7 @@ if S == 1
             end
         end
         ret(k) = ret(k) * h^2;
+        increment(progress);
     end
     %% plot the convergence rate
     g = 2.0./(floor(grow_rate.^(1:K) * base_grid));
@@ -119,72 +120,77 @@ if S == 1
     
     grid on;
 else
-    for s = 1:S
+    progress = PoolWaitbar(K*S, 'Starting');
+    parfor l = 1:K*S
         % random rotation
    
         theta = rand() * 2 * pi;
         v = [cos(theta), sin(theta)];
-
-        parfor k = 1:K
-            N = floor(grow_rate^k * base_grid);
-            if alpha == 0
-                EPS = 0.1;
-                shift = EPS/10 * [rand(), rand()];
-            else
-                EPS = 2 * (2/N)^alpha;
-                shift = EPS/2 * [rand(), rand()];
-            end
-    
-            pts = linspace(-1, 1, N + 1);    
-            h = 2 / N;   
-            [X, Y] = meshgrid(pts);
-
-            X = X + shift(1);
-            Y = Y + shift(2);
-            
-            M = (N + 1)^2;
         
-            for i = 1:M
-                rx = X(i) * v(1) + Y(i) * v(2);
-                ry = X(i) * v(2) - Y(i) * v(1);
-                
-                if rx > 0.5
-                    % in right semi-cicle centered at (0.5, 0),
-                    dist   =  sqrt((rx -0.5)^2 + ry^2) - opt.R;
-                    normal = [rx - 0.5, ry] / sqrt((rx-0.5)^2 + ry^2);
-                    Jac    = opt.R / (dist + opt.R);
-                    px = rx - dist * normal(1);
-                    py = ry - dist * normal(2);
-                    if abs(dist) <= EPS
-                        ret(k,s) = ret(k,s) + opt.f(px, py) *...
-                            weight_func(dist, EPS, opt) * Jac;
-                    end
+        [k, s] = ind2sub([K,S], l);
+        
+        N = floor(grow_rate^k * base_grid);
+        if alpha == 0
+            EPS = 0.1;
+            shift = EPS/10 * [rand(), rand()];
+        else
+            EPS = 2 * (2/N)^alpha;
+            shift = EPS/2 * [rand(), rand()];
+        end
+
+        pts = linspace(-1, 1, N + 1);    
+        h = 2 / N;   
+        [X, Y] = meshgrid(pts);
+
+        X = X + shift(1);
+        Y = Y + shift(2);
+        
+        M = (N + 1)^2;
     
-                elseif rx < -0.5
-                    % in left semi-circle centered at (-0.5, 0)
-                    dist   =  sqrt((rx + 0.5)^2 + ry^2) - opt.R;
-                    normal = [rx + 0.5, ry] / sqrt((rx + 0.5)^2 + ry^2);
-                    Jac    = opt.R / (dist + opt.R);
-                    px = rx - dist * normal(1);
-                    py = ry - dist * normal(2);
-                    if abs(dist) <= EPS
-                        ret(k,s) = ret(k,s) + opt.f(px, py) *...
-                            weight_func(dist, EPS, opt) * Jac;
-                    end
-                else
-                    % in rectangle
-                    if abs(ry - opt.R) <= EPS
-                        ret(k,s) = ret(k,s) +  opt.f(rx, opt.R) *...
-                            weight_func(ry - opt.R, EPS, opt);
-                    elseif abs(ry + opt.R) <= EPS
-                        ret(k,s) = ret(k,s) +  opt.f(rx, -opt.R) *...
-                            weight_func(ry + opt.R, EPS, opt);
-                    end
+        for i = 1:M
+            rx = X(i) * v(1) + Y(i) * v(2);
+            ry = X(i) * v(2) - Y(i) * v(1);
+            
+            if rx > 0.5
+                % in right semi-cicle centered at (0.5, 0),
+                dist   =  sqrt((rx -0.5)^2 + ry^2) - opt.R;
+                normal = [rx - 0.5, ry] / sqrt((rx-0.5)^2 + ry^2);
+                Jac    = opt.R / (dist + opt.R);
+                px = rx - dist * normal(1);
+                py = ry - dist * normal(2);
+                if abs(dist) <= EPS
+                    ret(l) = ret(l) + opt.f(px, py) *...
+                        weight_func(dist, EPS, opt) * Jac;
+                end
+
+            elseif rx < -0.5
+                % in left semi-circle centered at (-0.5, 0)
+                dist   =  sqrt((rx + 0.5)^2 + ry^2) - opt.R;
+                normal = [rx + 0.5, ry] / sqrt((rx + 0.5)^2 + ry^2);
+                Jac    = opt.R / (dist + opt.R);
+                px = rx - dist * normal(1);
+                py = ry - dist * normal(2);
+                if abs(dist) <= EPS
+                    ret(l) = ret(l) + opt.f(px, py) *...
+                        weight_func(dist, EPS, opt) * Jac;
+                end
+            else
+                % in rectangle
+                if abs(ry - opt.R) <= EPS
+                    ret(l) = ret(l) +  opt.f(rx, opt.R) *...
+                        weight_func(ry - opt.R, EPS, opt);
+                elseif abs(ry + opt.R) <= EPS
+                    ret(l) = ret(l) +  opt.f(rx, -opt.R) *...
+                        weight_func(ry + opt.R, EPS, opt);
                 end
             end
-            ret(k,s) = ret(k,s) * h^2;
         end
+        ret(l) = ret(l) * h^2;
+        
+        increment(progress);
     end
+
+    ret = reshape(ret, K, S);
 
     %% plot the convergence rate
     g = 2./( floor(base_grid * grow_rate.^(1:K)));
