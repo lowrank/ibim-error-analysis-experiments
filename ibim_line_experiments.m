@@ -35,7 +35,7 @@ grow_rate = 1.2;
 if S == 1
     opt.random = false;
     v  = [opt.slope,  1]/sqrt(1 + opt.slope^2);
-
+    progress = PoolWaitbar(K, 'Starting');
     parfor k = 1:K
         N = floor(grow_rate^k * base_grid);
         if alpha == 0
@@ -64,6 +64,7 @@ if S == 1
         end
 
         ret(k) = ret(k) * h^2;
+        increment(progress);
     end
     %% plot the convergence rate
     g = 2.0./(floor(grow_rate.^(1:K) * base_grid));
@@ -78,6 +79,7 @@ if S == 1
     
     grid on;
 else
+    progress = PoolWaitbar(S, 'Starting');
     parfor s = 1:S
         % random rotation
         theta = rand() * 2 * pi;
@@ -118,6 +120,7 @@ else
     
             ret(k, s) = ret(k, s) * h^2;
         end
+        increment(progress);
     end
 
     %% plot the convergence rate
