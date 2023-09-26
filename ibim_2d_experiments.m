@@ -72,21 +72,26 @@ if S == 1 % no random translation is applied
 
 else % random translations are used
     opt.random = true;
-    progress = PoolWaitbar(K, 'Starting');
-    for k = 1:K
+    progress = PoolWaitbar(K*S, 'Starting');
+    parfor l = 1:K*S
+        
+        [k, s] = ind2sub([K, S], l);
+
         N = floor(grow_rate^k * base_grid);
+
         if alpha == 0
             EPS = 0.1;
         else
             EPS = 2 * (2/N)^alpha;
         end
 
-        parfor s = 1:S
-            % add random translation
-            ret(k, s) = ibim_quadrature_2d(N, EPS, opt);
-        end
+
+        ret(l) = ibim_quadrature_2d(N, EPS, opt);
+        
         increment(progress);
     end
+
+    ret = reshape(ret, K, S);
 
     %% plot the convergence rate
     g = 2./( floor(base_grid * grow_rate.^(1:K)));
