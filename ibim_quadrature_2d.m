@@ -1,34 +1,28 @@
 function ret = ibim_quadrature_2d(N, EPS, opt)
-     
-    if opt.random
-        shift = EPS/10 * [rand(), rand()];
-    else
-        shift = [0, 0];
-    end
 
-    pts = linspace (-1, 1, N + 1);
     h   = 2 / N;
-
-    [X, Y] = meshgrid (pts);
-    M      = (N+1)^2;
-
-    % make a shift of grid.
-    X = X + shift(1);
-    Y = Y + shift(2);
+    qt = qtree(2, 2/N, EPS, opt.random); % no rotation.
+    qt.distFunc = @(x) (dist2curve(x(1), x(2), opt));
+    qt.populate();
+    M = length(qt.validList);
 
     ret = 0;  % initialize the integral.
     for i = 1:M
+        id = qt.validList(i);
 
-        [d, n, J] = dist2curve(X(i), Y(i), opt);
+        X = qt.dict{id}.center(1);
+        Y = qt.dict{id}.center(2);
+        
+        [d, n, J] = dist2curve(X, Y, opt);
         % projection.
-        px = X(i) - d * n(1);
-        py = Y(i) - d * n(2);
+        px = X - d * n(1);
+        py = Y - d * n(2);
 
         % compute the integral.
         if abs(d) < EPS 
             ret = ret + opt.f(px, py) * weight_func(d, EPS, opt) * J; 
         end
-
+        
     end
 
     ret = ret * h^2;

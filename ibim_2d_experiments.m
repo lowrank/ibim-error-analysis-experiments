@@ -7,6 +7,8 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+addpath(genpath('./'));
+
 opt.type = 'circle'; % type of the domain
 opt.R  = 0.75;       % radius of the circle
 opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3); % test integrand 
@@ -34,7 +36,7 @@ alpha = 0.5;  % parameter for the tube width
 beta  = 0.5 + (opt.q + 1) * (1 - alpha);  % theoretical value of decay rate.
 
 K = 24; % number of grid sizes.
-S = 32;  % number of sampled translations.
+S = 1;  % number of sampled translations.
 
 ret = zeros(K, S); % return value of the integral.
 

@@ -5,6 +5,7 @@
 % Capsule Experiments
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+addpath(genpath('./'));
 
 opt.type = 'capsule';
 opt.q = 1;
