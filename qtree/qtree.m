@@ -135,15 +135,11 @@ classdef qtree < handle
                         obj.dict{ obj.maxId }.radius = obj.dict{ id_ }.radius / 2;
 
                     end
+                    % recursive calls
                     for i = 1:(2^obj.dim)
                         obj = assignNodes(obj, obj.dict{id_}.child(i));
-                    end
-                else
-                    % not a valid grid to proceed.
-                    obj.dict{id_}.isValid = false;
-                    obj.dict{id_}.isLeaf = false;
+                    end                    
                 end
-
             end
         end
     end

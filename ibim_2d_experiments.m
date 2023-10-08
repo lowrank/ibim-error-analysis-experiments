@@ -29,14 +29,14 @@ end
 fprintf('accurate integral is %1.15f by Mathematica.\n', acc);
 
 %% regularity
-opt.q = 1; % order of the regularity 
+opt.q = 2; % order of the regularity 
 
 %% tube width
 alpha = 0.5;  % parameter for the tube width
 beta  = 0.5 + (opt.q + 1) * (1 - alpha);  % theoretical value of decay rate.
 
 K = 24; % number of grid sizes.
-S = 1;  % number of sampled translations.
+S = 32;  % number of sampled translations.
 
 ret = zeros(K, S); % return value of the integral.
 

@@ -20,4 +20,6 @@ end
 
 pts = pts(:,all(pts,1));
 scatter(pts(1, :), pts(2, :));
-daspect([1 1 1])
+daspect([1 1 1]);
+grid on;
+grid minor
