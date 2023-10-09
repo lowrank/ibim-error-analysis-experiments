@@ -13,7 +13,10 @@ opt.type = 'circle'; % type of the domain
 opt.R  = 0.75;       % radius of the circle
 acc = 0.992902336403640;
 
-% uncomment for experiments on ellipse
+% uncomment for experiments on ellipse, only works for thin tube since the
+% distance function has a relative low accuracy which caused the jacobian
+% to be inaccurate as well.
+
 % opt.type = 'ellipse'; % type of the domain
 % opt.Rx = 0.75;
 % opt.Ry = 0.6;
@@ -23,10 +26,10 @@ opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3); % test integrand
 fprintf('accurate integral is %1.15f by Mathematica.\n', acc);
 
 % regularity
-opt.q = 1; % order of the regularity 
+opt.q = 2; % order of the regularity 
 
 % tube width
-alpha = 1;  % parameter for the tube width
+alpha = 0.5;  % parameter for the tube width
 beta  = 0.5 + (opt.q + 1) * (1 - alpha);  % theoretical value of decay rate.
 
 K = 24; % number of grid sizes.
@@ -105,6 +108,7 @@ else % random translations are used
 
 end
 
-
+F = findall(0,'type','figure','tag','TMWWaitbar');
+delete(F);
 
 
