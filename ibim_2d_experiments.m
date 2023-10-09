@@ -11,33 +11,28 @@ addpath(genpath('./'));
 
 opt.type = 'circle'; % type of the domain
 opt.R  = 0.75;       % radius of the circle
+acc = 0.992902336403640;
+
+% uncomment for experiments on ellipse
+% opt.type = 'ellipse'; % type of the domain
+% opt.Rx = 0.75;
+% opt.Ry = 0.6;
+% acc = 0.672602390335232;
+
 opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3); % test integrand 
-
-% call Mathematica to produce accurate value.
-if check_installation()
-    F = sprintf(['''NIntegrate[%f * Cos[%f^2 * Cos[t]^2 - %f * Sin[t]]', ...
-        '* Sin[%f^2 * Sin[t]^2 - %f^3 * Cos[t]^3],', ...
-        '{t, 0, 2*Pi}, WorkingPrecision->15]'''],...
-        opt.R, opt.R, opt.R, opt.R, opt.R);  % Mathematica Eval
-    
-    [status, cmdout] = system(sprintf(['wolframscript -code ', F]));
-    acc = str2double( cmdout(1:16) );
-else 
-    acc = 0.992902336403640;
-end
-
 fprintf('accurate integral is %1.15f by Mathematica.\n', acc);
 
-%% regularity
-opt.q = 2; % order of the regularity 
+% regularity
+opt.q = 1; % order of the regularity 
 
-%% tube width
-alpha = 0.5;  % parameter for the tube width
+% tube width
+alpha = 1;  % parameter for the tube width
 beta  = 0.5 + (opt.q + 1) * (1 - alpha);  % theoretical value of decay rate.
 
 K = 24; % number of grid sizes.
 S = 32;  % number of sampled translations.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ret = zeros(K, S); % return value of the integral.
 
 base_grid = 100;
