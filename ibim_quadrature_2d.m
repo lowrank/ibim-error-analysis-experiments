@@ -20,7 +20,7 @@ function ret = ibim_quadrature_2d(N, EPS, opt)
 
         % compute the integral.
         if abs(d) < EPS 
-            ret = ret + opt.f(px, py) * weight_func(d, EPS, opt) * J; 
+            ret = ret + opt.f(px, py) * weight_func(d, EPS, opt) * J;
         end
         
     end
