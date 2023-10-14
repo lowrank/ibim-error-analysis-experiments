@@ -110,7 +110,6 @@ else % random translations are used
     ret = reshape(ret, K, S);
 
     %% plot the convergence rate
-    beta = 0.5;
     g = 2./( floor(base_grid * grow_rate.^(1:K)));
 
     var_err = sum( (ret - acc).^2, 2)/S;
