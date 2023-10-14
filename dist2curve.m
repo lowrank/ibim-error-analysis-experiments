@@ -28,5 +28,29 @@ function [dist, normal, Jac] = dist2curve(x, y, opt)
         % suffice for low regularity weight functions and thin width.
 
         Jac = 1;
+
+
+    elseif strcmp(opt.type, 'degenerate')
+        distSquared = (x - opt.anchor(:,1)).^2 + (y - opt.anchor(:,2)).^2;
+        [~, idx] = min(distSquared);
+        minAngle = opt.angles(idx);
+
+        objFunc = @(angle) ( (sqrt( opt.Rx * abs(cos(angle)) ) .* sign(cos(angle))  - x )^2 + ( opt.Ry * sin(angle) - y )^2 ) ;
+        
+        [projAngle, ~, ~, ~] =fminunc(objFunc, minAngle, opt.min_options);
+
+        if x^4/opt.Rx^2 + y^2/opt.Ry^2 >= 1
+            dist = sqrt( (x - sqrt(opt.Rx * abs(cos(projAngle))) * sign(cos(projAngle)))^2 + (y - opt.Ry * sin(projAngle))^2 );
+        else
+            dist = -sqrt( (x - sqrt(opt.Rx * abs(cos(projAngle))) * sign(cos(projAngle)))^2 + (y - opt.Ry * sin(projAngle))^2 );
+        end 
+
+        normal = [2*(opt.Rx * cos(projAngle))*sqrt(opt.Rx * abs(cos(projAngle))) / opt.Rx^2, opt.Ry * sin(projAngle) / opt.Ry^2];
+        normal = normal / sqrt(normal(1)^2 + normal(2)^2);
+
+        % Jac =  1 + dist * Laplace (dist), a 4th order scheme should
+        % suffice for low regularity weight functions and thin width.
+
+        Jac = 1;
     end
 end

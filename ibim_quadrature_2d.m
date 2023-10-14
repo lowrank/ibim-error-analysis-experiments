@@ -1,7 +1,11 @@
 function ret = ibim_quadrature_2d(N, EPS, opt)
 
     h   = 2 / N;
-    qt = qtree(2, 2/N, EPS, opt.random); % no rotation.
+    if isfield(opt, 'random_rot')
+        qt = qtree(2, 2/N, EPS, opt.random, opt.random_rot); % no rotation.
+    else
+        qt = qtree(2, 2/N, EPS, opt.random); % no rotation.
+    end
     qt.distFunc = @(x) (dist2curve(x(1), x(2), opt));
     qt.populate();
     M = length(qt.validList);

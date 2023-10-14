@@ -13,9 +13,7 @@ opt.type = 'circle'; % type of the domain
 opt.R  = 0.75;       % radius of the circle
 acc = 0.992902336403640;
 
-% uncomment for experiments on ellipse, only works for thin tube since the
-% distance function has a relative low accuracy which caused the jacobian
-% to be inaccurate as well.
+% uncomment the following code block for experiments on ellipse.
 
 % opt.type = 'ellipse'; % type of the domain
 % opt.Rx = 0.75;
@@ -23,10 +21,24 @@ acc = 0.992902336403640;
 % angles = linspace(0, 2*pi, 100);
 % opt.angles = angles(1:end-1);
 % opt.anchor = [opt.Rx * cos(opt.angles); opt.Ry * sin(opt.angles)]';
-% opt.min_options = optimoptions('fminunc','Display', 'off');
+% opt.min_options = optimoptions('fminunc','Display', 'off', 'TolFun', 1e-12, 'TolX', 1e-12);
 % acc = 0.672602390335232;
 
+% uncomment the following code block for experiments on convex curve with '
+% zero curvature points.
+% opt.type = 'degenerate'; % type of the domain
+% opt.random_rot = false;
+% opt.Rx  = 0.75^2;       
+% opt.Ry  = 0.75;
+% angles = linspace(0, 2*pi, 100);
+% opt.angles = angles(1:end-1);
+% opt.anchor = [sqrt( opt.Rx * abs(cos(opt.angles)) ) .* sign(cos(opt.angles)) ; opt.Ry * sin(opt.angles)]';
+% opt.min_options = optimoptions('fminunc','Display', 'off', 'TolFun', 1e-12, 'TolX', 1e-12);
+% acc = 1.15335526133127;
+
+
 opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3); % test integrand 
+
 fprintf('accurate integral is %1.15f by Mathematica.\n', acc);
 
 % regularity
@@ -60,7 +72,7 @@ if S == 1 % no random translation is applied
     end
    
 
-    % plot the convergence rate
+    %% plot the convergence rate
     g = 2./(floor(base_grid * grow_rate.^(1:K)));
 
     err = abs(ret - acc);
@@ -98,6 +110,7 @@ else % random translations are used
     ret = reshape(ret, K, S);
 
     %% plot the convergence rate
+    beta = 0.5;
     g = 2./( floor(base_grid * grow_rate.^(1:K)));
 
     var_err = sum( (ret - acc).^2, 2)/S;
