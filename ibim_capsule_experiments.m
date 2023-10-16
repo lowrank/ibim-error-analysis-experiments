@@ -118,7 +118,7 @@ if S == 1
         sprintf('O(h^{%1.1f})', delta),...
         'Location', 'southeast');
     fontsize(legend_handler,18,'points');
-    
+    fontsize(gca, 15,'points');
     grid on;
 else
     progress = PoolWaitbar(K*S, 'Starting');
@@ -205,7 +205,7 @@ else
     legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', delta),...
         sprintf('O(h^{%1.1f})', 2*kappa), 'Location', 'southeast');
     fontsize(legend_handler,18,'points');
-
+    fontsize(gca, 15,'points');
     grid on;
 end
 

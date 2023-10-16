@@ -45,11 +45,11 @@ fprintf('accurate integral is %1.15f by Mathematica.\n', acc);
 opt.q = 2; % order of the regularity 
 
 % tube width
-alpha = 1;  % parameter for the tube width
+alpha = 0.5;  % parameter for the tube width
 beta  = 0.5 + (opt.q + 1) * (1 - alpha);  % theoretical value of decay rate.
 
 K = 24; % number of grid sizes.
-S = 32;  % number of sampled translations.
+S = 1;  % number of sampled translations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ret = zeros(K, S); % return value of the integral.
@@ -82,7 +82,7 @@ if S == 1 % no random translation is applied
 
     legend_handler = legend('quadrature error', sprintf('O(h^{%1.1f})', beta), 'Location', 'northwest');
     fontsize(legend_handler,18,'points');
-
+    fontsize(gca, 15,'points');
     grid on;
 
 
@@ -118,7 +118,7 @@ else % random translations are used
     loglog(g, var_err, '-bo',  g, gamma * g.^(2*beta), '-r');
     legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', 2*beta), 'Location', 'northwest');
     fontsize(legend_handler,18,'points');
-
+    fontsize(gca, 15,'points');
     grid on;
     
 
@@ -127,4 +127,7 @@ end
 F = findall(0,'type','figure','tag','TMWWaitbar');
 delete(F);
 
+filename = sprintf('2D-T%s-Q%d-K%d-S%d-A%6.4f.png',opt.type, opt.q, K, S, alpha);
+exportgraphics(gca,filename,'Resolution',300);
+close all;
 
