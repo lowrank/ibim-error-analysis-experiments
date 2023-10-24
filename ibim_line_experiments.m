@@ -143,3 +143,8 @@ end
 
 F = findall(0,'type','figure','tag','TMWWaitbar');
 delete(F);
+
+filename = sprintf('2D-T%s-Q%d-K%d-S%d-A%6.4f.png',opt.type, opt.q, K, S, alpha);
+exportgraphics(gca,filename,'Resolution',300);
+close all;
+

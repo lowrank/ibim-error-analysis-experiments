@@ -61,3 +61,7 @@ for i = 1:M
 end
 
 daspect([1 1 1])
+
+fontsize(gca, 15,'points');
+exportgraphics(gca,'capsule.png','Resolution',300);
+close all;

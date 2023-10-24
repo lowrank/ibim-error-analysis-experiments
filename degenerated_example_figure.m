@@ -47,5 +47,8 @@ for i = 1:length(X)^2
     hold on;
     end
 end
-
-daspect([1 1 1])
+hold off;
+daspect([1 1 1]);
+fontsize(gca, 15,'points');
+exportgraphics(gca,'ibim_2d_straight_line.png','Resolution',300);
+close all;
