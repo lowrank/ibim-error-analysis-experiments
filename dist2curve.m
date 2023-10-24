@@ -29,7 +29,6 @@ function [dist, normal, Jac] = dist2curve(x, y, opt)
 
         Jac = 1;
 
-
     elseif strcmp(opt.type, 'degenerate')
         distSquared = (x - opt.anchor(:,1)).^2 + (y - opt.anchor(:,2)).^2;
         [~, idx] = min(distSquared);
@@ -51,6 +50,28 @@ function [dist, normal, Jac] = dist2curve(x, y, opt)
         % Jac =  1 + dist * Laplace (dist), a 4th order scheme should
         % suffice for low regularity weight functions and thin width.
 
+        Jac = 1;
+    elseif strcmp(opt.type, 'star')
+        distSquared = (x - opt.anchor(:,1)).^2 + (y - opt.anchor(:,2)).^2;
+        [~, idx] = min(distSquared);
+        minAngle = opt.angles(idx);
+        objFunc = @(angle) ( ( (opt.R + opt.r * cos(opt.m * angle) ) * cos(angle) - x )^2 + ...
+            ( (opt.R + opt.r * cos(opt.m * angle) ) * sin(angle) - y )^2 ) ;
+
+        [projAngle, ~, ~, ~] =fminunc(objFunc, minAngle, opt.min_options);
+
+        L = sqrt(x^2 + y^2);
+        rho = opt.R + opt.r * cos(opt.m * projAngle);
+        rhop = -opt.r * opt.m * sin(opt.m * projAngle);
+        if L > rho
+            dist = sqrt((x - (opt.R + opt.r * cos(opt.m * projAngle))*cos(projAngle))^2 +...
+                (y - (opt.R + opt.r * cos(opt.m * projAngle))*sin(projAngle))^2   );
+        else 
+            dist = -sqrt((x - (opt.R + opt.r * cos(opt.m * projAngle))*cos(projAngle))^2 +...
+                (y - (opt.R + opt.r * cos(opt.m * projAngle))*sin(projAngle))^2   );
+        end
+        normal = [rho * cos(projAngle) + rhop * sin(projAngle), rho * sin(projAngle) - rhop * cos(projAngle) ];
+        normal = normal / sqrt(normal(1)^2 + normal(2)^2);
         Jac = 1;
     end
 end

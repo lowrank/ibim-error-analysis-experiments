@@ -9,9 +9,9 @@
 
 addpath(genpath('./'));
 
-opt.type = 'circle'; % type of the domain
-opt.R  = 0.75;       % radius of the circle
-acc = 0.992902336403640;
+% opt.type = 'circle'; % type of the domain
+% opt.R  = 0.75;       % radius of the circle
+% acc = 0.992902336403640;
 
 % uncomment the following code block for experiments on ellipse.
 
@@ -36,25 +36,38 @@ acc = 0.992902336403640;
 % opt.min_options = optimoptions('fminunc','Display', 'off', 'TolFun', 1e-12, 'TolX', 1e-12);
 % acc = 1.15335526133127;
 
+% uncomment the following for star shape boundary.
+opt.type = 'star';
+opt.random_rot = true;
+opt.R = 0.75;
+opt.r = 0.2;
+opt.m = 3;
+angles = linspace(0, 2*pi, 100);
+opt.angles = angles(1:end-1);
+opt.anchor = [ (opt.R + opt.r * cos(opt.m * opt.angles) ) .* cos(opt.angles) ;...
+    (opt.R + opt.r * cos(opt.m * opt.angles) ) .* sin(opt.angles)]';
+opt.min_options = optimoptions('fminunc','Display', 'off', 'TolFun', 1e-12, 'TolX', 1e-12);
+acc = 0.986770621149293;
 
+% integrand function
 opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3); % test integrand 
 
 fprintf('accurate integral is %1.15f by Mathematica.\n', acc);
 
 % regularity
-opt.q = 2; % order of the regularity 
+opt.q = 1; % order of the regularity 
 
 % tube width
 alpha = 0.5;  % parameter for the tube width
 beta  = 0.5 + (opt.q + 1) * (1 - alpha);  % theoretical value of decay rate.
 
 K = 24; % number of grid sizes.
-S = 1;  % number of sampled translations.
+S = 32;  % number of sampled translations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ret = zeros(K, S); % return value of the integral.
 
-base_grid = 100;
+base_grid = 10;
 grow_rate = 1.2;
 
 if S == 1 % no random translation is applied
