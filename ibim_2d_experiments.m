@@ -52,6 +52,10 @@ acc = 0.986770621149293;
 % integrand function
 opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3); % test integrand 
 
+% uncomment the following to test open curves.
+% opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3) .* (y > 0); % test integrand 
+
+
 fprintf('accurate integral is %1.15f by Mathematica.\n', acc);
 
 % regularity
