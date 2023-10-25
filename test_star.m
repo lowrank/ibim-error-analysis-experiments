@@ -12,12 +12,17 @@ opt.min_options = optimoptions('fminunc','Display', 'off', 'TolFun', 1e-12, 'Tol
 opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3); % test integrand 
 opt.acc = 0.986770621149293;
 % regularity
-opt.q = 1;
+opt.q = 2;
 % tube width
-opt.alpha = 1;  % parameter for the tube width
+opt.alpha = 0.5;  % parameter for the tube width
 opt.beta  = 0.5 + (opt.q + 1) * (1 - opt.alpha);  % theoretical value of decay rate.
 
-K = 10; % number of grid sizes.
+
+if isfield(opt, 'upsilon')
+    opt = rmfield(opt, 'upsilon');
+end
+
+K = 2;
 S = 32;  % number of sampled translations.
 
 ibim_2d_experiments(K, S, opt)
