@@ -27,7 +27,9 @@ function [dist, normal, Jac] = dist2curve(x, y, opt)
         % Jac =  1 + dist * Laplace (dist), a 4th order scheme should
         % suffice for low regularity weight functions and thin width.
 
-        Jac = 1;
+        kappa = (opt.Rx * opt.Ry)/(opt.Rx^2 * sin(projAngle)^2 + opt.Ry^2 * cos(projAngle)^2)^(3/2);
+        
+        Jac = 1/(1 + kappa * dist);
 
     elseif strcmp(opt.type, 'degenerate')
         distSquared = (x - opt.anchor(:,1)).^2 + (y - opt.anchor(:,2)).^2;
@@ -49,8 +51,11 @@ function [dist, normal, Jac] = dist2curve(x, y, opt)
 
         % Jac =  1 + dist * Laplace (dist), a 4th order scheme should
         % suffice for low regularity weight functions and thin width.
+        
+        kappa = sqrt(opt.Rx) * opt.Ry * (1/2 + sin(projAngle)^2/4) * abs(cos(projAngle))/(opt.Rx*sin(projAngle)^2/4 + opt.Ry^2 * abs(cos(projAngle))^3)^(3/2);
 
-        Jac = 1;
+        Jac = 1/(1 + kappa * dist);
+
     elseif strcmp(opt.type, 'star')
         distSquared = (x - opt.anchor(:,1)).^2 + (y - opt.anchor(:,2)).^2;
         [~, idx] = min(distSquared);
@@ -72,6 +77,11 @@ function [dist, normal, Jac] = dist2curve(x, y, opt)
         end
         normal = [rho * cos(projAngle) + rhop * sin(projAngle), rho * sin(projAngle) - rhop * cos(projAngle) ];
         normal = normal / sqrt(normal(1)^2 + normal(2)^2);
-        Jac = 1;
+
+
+        rhopp = -opt.r * opt.m^2 * cos(opt.m * projAngle);
+        kappa = (2 * rhop^2 - rho * rhopp + rho^2)/(rhop^2 + rho^2)^(3/2);
+
+        Jac = 1/(1 + kappa * dist);
     end
 end
