@@ -51,7 +51,7 @@ function ibim_2d_experiments(K, S, opt)
         progress = PoolWaitbar(K*S, 'Starting');
         parfor l = 1:K*S
             
-            [k, s] = ind2sub([K, S], l);
+            [k, ~] = ind2sub([K, S], l);
     
             N = floor(grow_rate^k * base_grid);
     
