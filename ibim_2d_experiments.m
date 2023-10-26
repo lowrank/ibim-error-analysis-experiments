@@ -8,7 +8,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function ibim_2d_experiments(K, S, opt)
+function ret=ibim_2d_experiments(K, S, opt)
 
     addpath(genpath('./'));
     
@@ -78,7 +78,7 @@ function ibim_2d_experiments(K, S, opt)
         if isfield(opt, 'upsilon')
             tau = ( g.^(2*opt.upsilon) * var_err) / norm(g.^(2*opt.upsilon))^2;
             loglog(g, var_err, '-bo',  g, gamma * g.^(2*opt.beta), '-r', g, tau * g.^(2*opt.upsilon), '--k');
-            legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', 2*opt.beta), 'Location', 'northwest');
+            legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', 2*opt.beta), sprintf('O(h^{%1.1f})', 2*opt.upsilon), 'Location', 'northwest');
             fontsize(legend_handler,18,'points');
             fontsize(gca, 15,'points');
             grid on;

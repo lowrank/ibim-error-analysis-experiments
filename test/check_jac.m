@@ -5,16 +5,22 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-addpath(genpath('../'));
+addpath(genpath('./'));
 
-opt.type = 'degenerate'; % type of the domain
-opt.random_rot = false;
-opt.Rx  = 0.75^2;       
-opt.Ry  = 0.75;
-angles = linspace(0, 2*pi, 100);
-opt.angles = angles(1:end-1);
-opt.anchor = [sqrt( opt.Rx * abs(cos(opt.angles)) ) .* sign(cos(opt.angles)) ; opt.Ry * sin(opt.angles)]';
+opt.type = 'polynomial'; % type of the domain
+opt.random_rot = true;
+opt.pts = linspace(-0.75, 0.75, 100);
+opt.anchor = [opt.pts ; (opt.pts).^6]';
 opt.min_options = optimoptions('fminunc','Display', 'off', 'TolFun', 1e-12, 'TolX', 1e-12);
+
+% opt.type = 'degenerate'; % type of the domain
+% opt.random_rot = false;
+% opt.Rx  = 0.75^2;       
+% opt.Ry  = 0.75;
+% angles = linspace(0, 2*pi, 100);
+% opt.angles = angles(1:end-1);
+% opt.anchor = [sqrt( opt.Rx * abs(cos(opt.angles)) ) .* sign(cos(opt.angles)) ; opt.Ry * sin(opt.angles)]';
+% opt.min_options = optimoptions('fminunc','Display', 'off', 'TolFun', 1e-12, 'TolX', 1e-12);
 
 % opt.type = 'ellipse'; % type of the domain
 % opt.Rx = 0.75;
@@ -34,7 +40,7 @@ opt.min_options = optimoptions('fminunc','Display', 'off', 'TolFun', 1e-12, 'Tol
 % opt.anchor = [ (opt.R + opt.r * cos(opt.m * opt.angles) ) .* cos(opt.angles) ;...
 %     (opt.R + opt.r * cos(opt.m * opt.angles) ) .* sin(opt.angles)]';
 
-x = [0.95, 0.2];
+x = [0.4,0.6];
 [dist0, normal0, jac0] = dist2curve(x(1), x(2), opt);
 
 h = 1e-4;

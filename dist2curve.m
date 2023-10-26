@@ -83,5 +83,26 @@ function [dist, normal, Jac] = dist2curve(x, y, opt)
         kappa = (2 * rhop^2 - rho * rhopp + rho^2)/(rhop^2 + rho^2)^(3/2);
 
         Jac = 1/(1 + kappa * dist);
+
+    elseif strcmp(opt.type, "polynomial")
+        distSquared = (x - opt.anchor(:,1)).^2 + (y - opt.anchor(:,2)).^2;
+        [~, idx] = min(distSquared);
+        min_x = opt.pts(idx);
+
+        objFunc = @(pts) ( ( pts - x )^2 + ( (pts)^6 - y )^2 ) ;
+        [pts_m, ~, ~, ~] = fminunc(objFunc, min_x, opt.min_options);
+
+        if y > (pts_m)^6
+            dist = - sqrt((x - pts_m)^2 + (y - (pts_m)^6)^2 );
+        else
+            dist =   sqrt((x - pts_m)^2 + (y - (pts_m)^6)^2 );
+        end
+        normal = [1, 6 * (pts_m)^5];
+        normal = normal / sqrt(normal(1)^2 + normal(2)^2);
+
+        kappa = 30*(pts_m)^4/(1 + 36*(pts_m)^(10))^(3/2);
+        Jac = 1/(1 + kappa * dist);
     end
+
+
 end
