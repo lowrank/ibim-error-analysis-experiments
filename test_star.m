@@ -22,7 +22,7 @@ if isfield(opt, 'upsilon')
     opt = rmfield(opt, 'upsilon');
 end
 
-K = 2;
+K = 24;
 S = 32;  % number of sampled translations.
 
 ibim_2d_experiments(K, S, opt)

@@ -17,5 +17,4 @@ opt.upsilon = 1 + (opt.q + 1) * (1 - opt.alpha) / (opt.q + 2);
 K = 24; % number of grid sizes.
 S = 32;  % number of sampled translations.
 
-
 ibim_2d_experiments(K, S, opt)

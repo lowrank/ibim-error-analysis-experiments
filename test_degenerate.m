@@ -13,12 +13,17 @@ opt.acc = 1.15335526133127;
 % integrand function
 opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3); % test integrand 
 % regularity
-opt.q = 1;
+opt.q = 2;
 % tube width
-opt.alpha = 1;  % parameter for the tube width
+opt.alpha = 0;  % parameter for the tube width
 opt.beta  = 0.5 + (opt.q + 1) * (1 - opt.alpha);  % theoretical value of decay rate.
 
-K = 20; % number of grid sizes.
+if isfield(opt, 'upsilon')
+    opt = rmfield(opt, 'upsilon');
+end
+
+
+K = 24; % number of grid sizes.
 S = 32;  % number of sampled translations.
 
 ibim_2d_experiments(K, S, opt)

@@ -12,7 +12,11 @@ opt.q = 1;
 opt.alpha = 1;
 opt.beta = 1 + (opt.q + 1)* (1 - opt.alpha);
 
-K = 1;
+if isfield(opt, 'upsilon')
+    opt = rmfield(opt, 'upsilon');
+end
+
+K = 16;
 S = 32;
 
 ibim_3d_experiments(opt, K, S)
