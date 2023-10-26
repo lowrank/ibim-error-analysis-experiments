@@ -15,11 +15,11 @@ opt.acc = 0.6470539483149725;
 opt.f =  @(x, y)( cos(x.^2 - y)) .* sin(y.^2 - x.^3) .* (y > 0); % test integrand 
 % regularity
 opt.q = 2;
+
 % tube width
 opt.alpha = 0;  % parameter for the tube width
 opt.beta  = 0.5 + (opt.q + 1) * (1 - opt.alpha);  % theoretical value of decay rate.
 opt.upsilon = 1 + (opt.q + 1) * (1 - opt.alpha) / (opt.q + 2);
-
 
 K = 24; % number of grid sizes.
 S = 32;  % number of sampled translations.

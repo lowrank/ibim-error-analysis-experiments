@@ -16,7 +16,7 @@ if isfield(opt, 'upsilon')
     opt = rmfield(opt, 'upsilon');
 end
 
-K = 16;
-S = 32;
+K = 24;
+S = 64;
 
 ibim_3d_experiments(opt, K, S)
