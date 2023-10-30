@@ -8,13 +8,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function ret=ibim_2d_experiments(K, S, opt)
+function ret=ibim_2d_experiments(K, S, opt, base)
 
     addpath(genpath('./'));
     
     ret = zeros(K, S); % return value of the integral.
     
-    base_grid = 10;
+    if nargin == 3
+        base_grid = 10;
+    else
+        base_grid = base;
+    end
     grow_rate = 1.2;
     
     if S == 1 % no random translation is applied

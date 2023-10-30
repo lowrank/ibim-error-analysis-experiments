@@ -7,6 +7,7 @@ opt.acc = 1.71628896296959  * 0.75^2;
 
 % regularity of weight function
 opt.q = 1;
+opt.random_rot = false;
     
 % tube width
 opt.alpha = 1;
@@ -16,7 +17,7 @@ if isfield(opt, 'upsilon')
     opt = rmfield(opt, 'upsilon');
 end
 
-K = 24;
+K = 20;
 S = 64;
 
-ibim_3d_experiments(opt, K, S)
+ibim_3d_experiments(K, S, opt)

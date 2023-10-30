@@ -12,11 +12,11 @@ opt.f =  @(x, y)( cos(x.^2 - y)) .* cos(y.^2 - x.^3) .* (x > -0.5) .* (x < 0.5);
 opt.q = 1;
 
 % tube width
-opt.alpha = 1;  % parameter for the tube width
+opt.alpha = 0;  % parameter for the tube width
 opt.beta  = 0.5 + (opt.q + 1) * (1 - opt.alpha);  % theoretical value of decay rate.
 opt.upsilon = 1 + (opt.q + 1) * (1 - opt.alpha) / (opt.q + 2);
 
-K = 36; % number of grid sizes.
+K = 24; % number of grid sizes.
 S = 32;  % number of sampled translations.
 
 ibim_2d_experiments(K, S, opt)
