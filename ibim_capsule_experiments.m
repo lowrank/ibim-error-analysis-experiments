@@ -32,10 +32,8 @@ acc_rectangle    = 0.0778101035506957;
 acc = acc_semi_circles + acc_rectangle;
 
 %% tube width
-alpha= 1;
-beta = 2-alpha; % for lines
-kappa = 0.5 + (opt.q + 1) * (1 - alpha); % for curves
-delta = 3 - alpha;% for lines, random
+alpha= 0.5;
+delta = 3 - 2 * alpha;% for lines, random
 
 K = 24; % number of grid sizes
 S = 64; % number of sampled rigid transforms
@@ -199,11 +197,8 @@ else
     var_err = sum( (ret - acc).^2, 2)/S;
     gamma = ( g.^(delta) * var_err) / norm(g.^(delta))^2;% line
 
-    eta = ( g.^(2*kappa) * var_err) / norm(g.^(2*kappa))^2; %curve
-
-    loglog(g, var_err, '-bo',  g, gamma * g.^(delta), '-r', g, eta * g.^(2*kappa), '--k');
-    legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', delta),...
-        sprintf('O(h^{%1.1f})', 2*kappa), 'Location', 'southeast');
+    loglog(g, var_err, '-bo',  g, gamma * g.^(delta), '-r');
+    legend_handler = legend('error variance', sprintf('O(h^{%1.1f})', delta), 'Location', 'southeast');
     fontsize(legend_handler,18,'points');
     fontsize(gca, 15,'points');
     grid on;
