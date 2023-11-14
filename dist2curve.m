@@ -102,6 +102,11 @@ function [dist, normal, Jac] = dist2curve(x, y, opt)
 
         kappa = 30*(pts_m)^4/(1 + 36*(pts_m)^(10))^(3/2);
         Jac = 1/(1 + kappa * dist);
+
+    elseif strcmp(opt.type, 'line')
+        dist = y;
+        normal = [0, 1];
+        Jac = 1;
     end
 
 

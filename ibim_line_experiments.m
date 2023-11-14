@@ -21,12 +21,12 @@ opt.slope = sqrt(2);
 acc = 0.25;
 
 %% tube width
-alpha= 0;
+alpha= 1;
 beta = 2 - alpha; % irrational slope
 delta = 3 - alpha; % variance of random slope
 
 K = 24; % number of grid sizes
-S = 64; % number of sampled rigid transforms
+S = 32; % number of sampled rigid transforms
 
 ret = zeros(K*S, 1);
 

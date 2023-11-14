@@ -40,7 +40,7 @@ S = 64; % number of sampled rigid transforms
 
 ret = zeros(K * S, 1);
 
-base_grid = 100;
+base_grid = 10;
 grow_rate = 1.2;
 
 if S == 1
